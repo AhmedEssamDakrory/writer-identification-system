@@ -1,15 +1,12 @@
-from local_binary_pattern import LocalBinaryPatterns
-from sklearn.svm import LinearSVC
-from imutils import paths
+from local_binary_pattern import FeatureExtractor
 from matplotlib import pyplot as plt
 import pandas as pd
-import numpy as np
 import cv2
-import os
-desc = LocalBinaryPatterns(24, 8)
-image = cv2.imread('/home/mazen/IAM/training/d06-072.png')
+
+desc = FeatureExtractor(24, 8)
+image = cv2.imread('d06-072.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-hist = desc.describe(gray)
+hist = desc.local_binary_pattern(gray)
 print(hist.shape)
 plt.hist(hist)
 plt.title("histogram")
