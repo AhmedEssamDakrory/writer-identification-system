@@ -6,7 +6,7 @@ import os
 
 images = os.listdir("./formsA-D/")
 
-for image in images:
+for image in images[:-1]:
 
 	gray = cv2.imread("./formsA-D/"+image, 0)
 	
