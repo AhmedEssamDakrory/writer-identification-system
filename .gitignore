@@ -1,1 +1,5 @@
-/venv/
+*conda_env*
+*venv*
+*__pycache__*
+*.idea*
+*test*

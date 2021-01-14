@@ -5,7 +5,7 @@ from imutils import paths
 import cv2
 import os
 
-root_directory = '/home/mazen/PycharmProjects/writer-identification-system/test/'
+root_directory = 'test/'
 for file in os.listdir(root_directory):
     desc = LocalBinaryPatterns(8, 1)
     data = []
