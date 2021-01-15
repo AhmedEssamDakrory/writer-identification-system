@@ -20,7 +20,7 @@ def train():
 
     for image in trainset:
         
-        image = image[:-4]
+        image = image[:-1]
         print("./dataset/"+image+".png")
         gray = cv2.imread("./dataset/"+image+".png", 0)
         #results_file.write("Image: ", image)
@@ -55,6 +55,9 @@ def validate():
     feature_extractor = FeatureExtractor(8, 2)
 
     for image in validationset1:
+
+        image = image[:-1]
+        
         gray = cv2.imread("./dataset/"+image+".png", 0)
         prediction = get_prediction(gray, feature_extractor, model)[0]
         #time_taken = round(time.time() - start_time, 2)
