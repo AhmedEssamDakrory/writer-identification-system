@@ -16,7 +16,8 @@ class FeatureExtractor:
         return lbp
 
     def histogram(self, arr):
-        (hist, _) = np.histogram(arr, bins=np.arange(0, self.num_points + 3), range=(0, self.num_points + 2))
+        #(hist, _) = np.histogram(arr, bins=np.arange(0, self.num_points + 3), range=(0, self.num_points + 2))
+        (hist, _) = np.histogram(arr, bins= 256)
         hist = hist.astype("float")
         hist /= (hist.mean())
         return hist

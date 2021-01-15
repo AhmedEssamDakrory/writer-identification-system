@@ -1,6 +1,6 @@
 import cv2
-import matplotlib.pyplot as plt
-import matplotlib 
+#import matplotlib.pyplot as plt
+#import matplotlib 
 from PIL import Image
 from preprocessing import *
 from skimage.filters import threshold_otsu
@@ -176,7 +176,7 @@ class Preprocessor:
     
     @staticmethod
     def display_image(img):
-        dpi = matplotlib.rcParams['figure.dpi']
+        #dpi = matplotlib.rcParams['figure.dpi']
         height, width = img.shape
         # Determine the figures size in inches
         figsize = width / float(dpi), height / float(dpi)
