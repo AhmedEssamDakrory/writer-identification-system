@@ -194,7 +194,7 @@ class Preprocessor:
         valleys_pos = Preprocessor.get_valleys(hist, peaks_pos)
         Preprocessor.add_missed_valleys_and_peaks(hist, peaks_pos, valleys_pos)
         boundaries = Preprocessor.get_boundaries(valleys_pos, binary_img)
-        print(len(valleys_pos))
-        plt.plot(hist)
-        plt.show()
+        # print(len(valleys_pos))
+        # plt.plot(hist)
+        # plt.show()
         return boundaries
