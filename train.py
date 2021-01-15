@@ -8,9 +8,10 @@ import os
 import csv
 
 indcies = {}
+model = None
 
 def train():
-    global indcies
+    global indcies, model
 
     trainset = open("trainset.txt", "r")
     
@@ -47,7 +48,7 @@ def train():
     return
 
 def validate():
-    global indcies
+    global indcies, model
 
     results_file = open("results.txt", "w")
     validationset1 = open("validationset1.txt", "r")
@@ -57,7 +58,7 @@ def validate():
     for image in validationset1:
 
         image = image[:-1]
-        
+        print(image)
         gray = cv2.imread("./dataset/"+image+".png", 0)
         prediction = get_prediction(gray, feature_extractor, model)[0]
         #time_taken = round(time.time() - start_time, 2)
@@ -75,11 +76,11 @@ def get_features(img, feature_extractor):
 
 
 def get_prediction(image, feature_extractor, model):
-    line_boundries = Preprocessor.line_segmentation(Preprocessor.paragraph_extraction(gray))
+    line_boundries = Preprocessor.line_segmentation(Preprocessor.paragraph_extraction(image))
     lbp = []
     for line in line_boundries:
         if line[2]>line[0] and line[3]>line[1]:
-            lbp += list(feature_extractor.local_binary_pattern(gray[line[0]:line[2], line[1]:line[3]]).ravel())
+            lbp += list(feature_extractor.local_binary_pattern(image[line[0]:line[2], line[1]:line[3]]).ravel())
     hist = feature_extractor.histogram(lbp)
     return model.predict(hist.reshape(1, -1))
 
