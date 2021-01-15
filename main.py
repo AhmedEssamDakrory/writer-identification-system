@@ -16,7 +16,7 @@ def get_features(root_dir, file, feature_extractor):
             print(sample)
             gray = cv2.imread(sample, 0)
             # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            gray = Preprocessor.paragraphExtraction(gray)
+            gray = Preprocessor.paragraph_extraction(gray)
             hist = feature_extractor.local_binary_pattern(gray)
             labels.append(str(writer))
             features.append(hist)

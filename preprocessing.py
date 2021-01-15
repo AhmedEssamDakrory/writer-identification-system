@@ -10,7 +10,7 @@ import os
 
 class Preprocessor:
     @staticmethod
-    def paragraphExtraction(gray):
+    def paragraph_extraction(gray):
         edges = cv2.Sobel(gray, cv2.CV_8U, 0, 1, ksize=5)
         # Remove noise with opening operator
         kernel = np.ones((5, 5), np.uint8)
@@ -185,7 +185,7 @@ class Preprocessor:
         plt.show()
     
     @staticmethod
-    def lineSegmentation(cropped_img):
+    def line_segmentation(cropped_img):
         binary_img = Preprocessor.binarization(cropped_img)
         hist = np.sum(binary_img,axis=1).tolist()
         hist = Preprocessor.smooth_hist(hist, 30)
