@@ -1,6 +1,6 @@
 import cv2
-#import matplotlib.pyplot as plt
-#import matplotlib 
+import matplotlib.pyplot as plt
+import matplotlib 
 from PIL import Image
 from preprocessing import *
 from skimage.filters import threshold_otsu
@@ -49,6 +49,7 @@ class Preprocessor:
         diff = closed_img - opened_img
         closed_kernel2 = np.ones((5,5), np.float32)
         closed_img2 = cv2.morphologyEx(diff, cv2.MORPH_CLOSE, closed_kernel2)
+        closed_img2 = cv2.GaussianBlur(closed_img2,(9,9),0)
         # thresholding
         threshold = threshold_otsu(closed_img2)
         binary_img = closed_img2 > threshold
@@ -126,7 +127,17 @@ class Preprocessor:
                 if mx_peak_in_between >= 30:
                     valleys_pos.insert(i, missed_valley_pos)
                 
-                
+    @staticmethod
+    def remove_false_lines(hist, valleys_pos):
+        i = 1
+        while i < len(valleys_pos):
+            l = valleys_pos[i-1]
+            r = valleys_pos[i]
+            mx = max(hist[l:r])
+            if mx < 30:
+                valleys_pos.pop(i)
+            i += 1
+    
     @staticmethod
     def smooth_hist(hist, kernel_size):
         smoothed_hist = []
@@ -146,7 +157,7 @@ class Preprocessor:
             i -= 1
             
     @staticmethod
-    def get_boundaries(valleys_pos, binary_img):
+    def get_boundaries(valleys_pos, binary_img, hist):
         boundaries = []
         width = binary_img.shape[1]-1
         for i in range(1, len(valleys_pos), 1):
@@ -155,13 +166,17 @@ class Preprocessor:
             vertical_sum = np.sum(binary_img[up:down + 1, :], axis=0)
             x1 = 0
             x2 = width
-            while x1 < width and vertical_sum[x1] == 0:
+            while x1 < width and vertical_sum[x1] < 5:
                 x1 += 1
-            while x2 >= 0 and vertical_sum[x2] == 0:
+            while x2 >= 0 and vertical_sum[x2] < 5:
                 x2 -= 1
+            while up <= down and hist[up] == 0:
+                up += 1
+            while down >= up and hist[down] == 0:
+                down -= 1
             x1 = max(x1-10, 0)
             x2 = min(x2+10, width)
-            boundaries.append((valleys_pos[i-1], x1, valleys_pos[i], x2))
+            boundaries.append((up, x1, down, x2))
         return boundaries
             
         
@@ -176,7 +191,7 @@ class Preprocessor:
     
     @staticmethod
     def display_image(img):
-        #dpi = matplotlib.rcParams['figure.dpi']
+        dpi = matplotlib.rcParams['figure.dpi']
         height, width = img.shape
         # Determine the figures size in inches
         figsize = width / float(dpi), height / float(dpi)
@@ -193,8 +208,8 @@ class Preprocessor:
         peaks_pos = Preprocessor.get_peaks(hist)
         valleys_pos = Preprocessor.get_valleys(hist, peaks_pos)
         Preprocessor.add_missed_valleys_and_peaks(hist, peaks_pos, valleys_pos)
-        boundaries = Preprocessor.get_boundaries(valleys_pos, binary_img)
-        # print(len(valleys_pos))
-        # plt.plot(hist)
-        # plt.show()
+        Preprocessor.remove_false_lines(hist, valleys_pos)
+        boundaries = Preprocessor.get_boundaries(valleys_pos, binary_img, hist)
+#         plt.plot(hist)
+#         plt.show()
         return boundaries
