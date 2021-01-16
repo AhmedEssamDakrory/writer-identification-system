@@ -9,7 +9,6 @@ class FeatureExtractor:
         self.radius = radius
 
     def local_binary_pattern(self, image):
-
         threshold = threshold_otsu(image)
         image = 255 - image
         binary_img = (image > threshold)
