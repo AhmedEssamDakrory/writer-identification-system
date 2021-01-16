@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 from natsort import natsorted
 from sklearn.neighbors import KNeighborsClassifier
 
+train_line_voting = False
+predict_line_voting = True
 
 def get_features(root_dir, file, feature_extractor):
     labels = []
@@ -20,12 +22,28 @@ def get_features(root_dir, file, feature_extractor):
             gray = cv2.imread(sample, 0)
             cropped_img = Preprocessor.paragraph_extraction(gray)
             line_boundries = Preprocessor.line_segmentation(cropped_img)
+            hist = None
             for line in line_boundries:
                 lbp = list(
                     feature_extractor.local_binary_pattern(cropped_img[line[0]:line[2], line[1]:line[3]]).ravel())
-                hist = feature_extractor.histogram(lbp)
+                if train_line_voting:
+                    hist = feature_extractor.histogram(lbp)
+                    labels.append(str(writer))
+                    features.append(hist)
+#                     plt.plot(hist)
+#                     plt.show()
+                else:
+                    hist = feature_extractor.histogram_acc(lbp, hist)
+            if not train_line_voting:
+                hist /= (hist.mean())
                 labels.append(str(writer))
                 features.append(hist)
+            
+#                 plt.plot(hist)
+#                 plt.show()
+            
+#             Preprocessor.draw_segmented_lines(cropped_img, line_boundries)
+#             Preprocessor.display_image(cropped_img)
     return features, labels
 
 
@@ -35,22 +53,30 @@ def get_prediction(root_dir, file, feature_extractor, model):
     line_boundries = Preprocessor.line_segmentation(cropped_img)
     i = 0
     lst = []
+    hist = None
     for line in line_boundries:
         if line[2] > line[0] and line[3] > line[1]:
             lbp = list(feature_extractor.local_binary_pattern(cropped_img[line[0]:line[2], line[1]:line[3]]).ravel())
-            hist = feature_extractor.histogram(lbp)
-            lst.append(model.predict(hist.reshape(1, -1)))
-            #print("line " + str(i) + " presidctions is: ")
-            #print(lst[i])
+            if predict_line_voting:
+                hist = feature_extractor.histogram(lbp)
+                lst.append(model.predict(hist.reshape(1, -1)))
+                print("line " + str(i) + " presidctions is: ")
+                print(lst[i])
+            else:
+                hist = feature_extractor.histogram_acc(lbp, hist)
             i += 1
-    return max(lst, key=lst.count)
+    if not predict_line_voting:
+        hist /= (hist.mean())
+        return model.predict(hist.reshape(1, -1))
+    else:
+        return max(lst, key=lst.count)
 
 
 def main():
-    root_dir = 'test'
+    root_dir = 'testCases'
     time_file = open("time.txt", "w")
     results_file = open("results.txt", "w")
-    actual_result=open("actual_result.txt", "r")
+    actual_result=open("actual_results.txt", "r")
     actual_result_lines=actual_result.readlines()
     feature_extractor = FeatureExtractor(24, 8)
     correct_classification = 0
@@ -61,8 +87,8 @@ def main():
         start_time = time.time()
         features, labels = get_features(root_dir, test, feature_extractor)
 
-        model = KNeighborsClassifier(n_neighbors=3)
-#         model = SVC(C=0.5, gamma='auto', probability=True)
+#         model = KNeighborsClassifier(n_neighbors=3)
+        model = SVC(C=0.5, gamma='auto', probability=True)
         model.fit(features, labels)
 
         prediction = get_prediction(root_dir, test, feature_extractor, model)[0]
