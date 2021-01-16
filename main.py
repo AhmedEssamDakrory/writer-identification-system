@@ -1,6 +1,7 @@
 from local_binary_pattern import FeatureExtractor
 from preprocessing import *
 from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from imutils import paths
 import time
 import cv2
@@ -41,13 +42,13 @@ def main():
     root_dir = 'test'
     time_file = open("time.txt", "w")
     results_file = open("results.txt", "w")
-    feature_extractor = FeatureExtractor(8, 3)
+    feature_extractor = FeatureExtractor(24, 8)
     for test in os.listdir(root_dir):
         print("Test: ", test)
         start_time = time.time()
         features, labels = get_features(root_dir, test, feature_extractor)
 
-        model = LinearSVC()
+        model = SVC()
         model.fit(features, labels)
 
         prediction = get_prediction(root_dir, test, feature_extractor, model)[0]
