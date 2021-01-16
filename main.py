@@ -50,12 +50,12 @@ def get_features(root_dir, file, feature_extractor):
 def check_if_tie_voting(lst):
     lst.sort()
     counts = [len(list(group)) for key, group in groupby(lst)]
-    tie = False
-    for i in range(1, len(counts), 1):
-        if counts[i] == counts[i-1]:
-            tie = True
-            break
-    return tie
+    mx_cnt = max(counts)
+    cnt = 0
+    for i in range(len(counts)):
+        if counts[i] == mx_cnt:
+            cnt += 1
+    return cnt > 1
 
 def get_prediction(root_dir, file, feature_extractor, model):
     gray = cv2.imread(os.path.join(root_dir, file, 'test.png'), 0)
