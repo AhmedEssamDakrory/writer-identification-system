@@ -53,20 +53,22 @@ def main():
     actual_result=open("actual_result.txt", "r")
     actual_result_lines=actual_result.readlines()
     feature_extractor = FeatureExtractor(24, 8)
-    acc = 0
-    for test in natsorted(os.listdir(root_dir)):
+    correct_classification = 0
+    tests = natsorted(os.listdir(root_dir))
+    num_of_tests = len(tests)
+    for test in tests:
         print("Test: ", test)
         start_time = time.time()
         features, labels = get_features(root_dir, test, feature_extractor)
 
         model = KNeighborsClassifier(n_neighbors=3)
-        #model = SVC(C=0.5, gamma='auto', probability=True)
+#         model = SVC(C=0.5, gamma='auto', probability=True)
         model.fit(features, labels)
 
         prediction = get_prediction(root_dir, test, feature_extractor, model)[0]
         time_taken = round(time.time() - start_time, 2)
         if int(prediction)==int(actual_result_lines[int(test)-1]):
-            acc+=1
+            correct_classification += 1
         else:
             print("Wrong classified at TestCase ",test)
         print("Prediction: " + prediction)
@@ -76,7 +78,7 @@ def main():
     results_file.close()
     time_file.close()
 
-
+    acc = ( correct_classification / num_of_tests ) * 100.0
     print("Accuracy is : "+str(acc)+' % ')
 
 
