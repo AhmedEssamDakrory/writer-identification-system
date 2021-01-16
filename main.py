@@ -8,8 +8,9 @@ import os
 from matplotlib import pyplot as plt
 from natsort import natsorted
 from sklearn.neighbors import KNeighborsClassifier
+from itertools import groupby
 
-train_line_voting = False
+train_line_voting = True
 predict_line_voting = True
 
 def get_features(root_dir, file, feature_extractor):
@@ -46,6 +47,15 @@ def get_features(root_dir, file, feature_extractor):
 #             Preprocessor.display_image(cropped_img)
     return features, labels
 
+def check_if_tie_voting(lst):
+    lst.sort()
+    counts = [len(list(group)) for key, group in groupby(lst)]
+    tie = False
+    for i in range(1, len(counts), 1):
+        if counts[i] == counts[i-1]:
+            tie = True
+            break
+    return tie
 
 def get_prediction(root_dir, file, feature_extractor, model):
     gray = cv2.imread(os.path.join(root_dir, file, 'test.png'), 0)
@@ -54,6 +64,7 @@ def get_prediction(root_dir, file, feature_extractor, model):
     i = 0
     lst = []
     hist = None
+    hist_acc = None
     for line in line_boundries:
         if line[2] > line[0] and line[3] > line[1]:
             lbp = list(feature_extractor.local_binary_pattern(cropped_img[line[0]:line[2], line[1]:line[3]]).ravel())
@@ -62,18 +73,22 @@ def get_prediction(root_dir, file, feature_extractor, model):
                 lst.append(model.predict(hist.reshape(1, -1)))
                 print("line " + str(i) + " presidctions is: ")
                 print(lst[i])
-            else:
-                hist = feature_extractor.histogram_acc(lbp, hist)
+            hist_acc = feature_extractor.histogram_acc(lbp, hist_acc)
             i += 1
     if not predict_line_voting:
-        hist /= (hist.mean())
-        return model.predict(hist.reshape(1, -1))
+        hist_acc /= (hist_acc.mean())
+        return model.predict(hist_acc.reshape(1, -1))
     else:
-        return max(lst, key=lst.count)
+        tie = check_if_tie_voting(lst)
+        if tie:
+            print("tie! predict on accumulated histogram")
+            return model.predict(hist_acc.reshape(1, -1))
+        else:
+            return max(lst, key=lst.count)
 
 
 def main():
-    root_dir = 'testCases'
+    root_dir = 'TestCases'
     time_file = open("time.txt", "w")
     results_file = open("results.txt", "w")
     actual_result=open("actual_results.txt", "r")
@@ -87,8 +102,8 @@ def main():
         start_time = time.time()
         features, labels = get_features(root_dir, test, feature_extractor)
 
-#         model = KNeighborsClassifier(n_neighbors=3)
-        model = SVC(C=0.5, gamma='auto', probability=True)
+        model = KNeighborsClassifier(n_neighbors=3)
+#         model = SVC(C=0.5, gamma='auto', probability=True)
         model.fit(features, labels)
 
         prediction = get_prediction(root_dir, test, feature_extractor, model)[0]
