@@ -19,7 +19,7 @@ class FeatureExtractor:
         #threshold the image
         #binary_img = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)[1]
 
-        lbp = feature.local_binary_pattern(image, self.num_points, self.radius, method="uniform")
+        lbp = feature.local_binary_pattern(image, self.num_points, self.radius, method="default")
         
         lbp = lbp[binary_img == True]
         return lbp
