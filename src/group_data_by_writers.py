@@ -1,5 +1,5 @@
 from random import random
-from constants import *
+from src.constants import *
 import pandas as pd
 import os
 import secrets

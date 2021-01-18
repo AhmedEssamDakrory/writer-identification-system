@@ -5,7 +5,7 @@ import os
 import secrets
 import shutil
 from imutils import paths
-from constants import *
+from src.constants import *
 
 dictionary = {}
 file = pd.read_csv(INPUTS_DIR+'/writer-id.csv', encoding="ISO-8859-1")
