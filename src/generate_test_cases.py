@@ -5,9 +5,10 @@ import os
 import secrets
 import shutil
 from imutils import paths
+from constants import *
 
 dictionary = {}
-file = pd.read_csv('writer-id.csv', encoding="ISO-8859-1")
+file = pd.read_csv(INPUTS_DIR+'/writer-id.csv', encoding="ISO-8859-1")
 for i in range(0, len(list(file['image']))):
     dictionary[file['image'][i]] = file['label'][i]
 writer_dict = {}
@@ -21,19 +22,17 @@ for key, value in writer_dict.items():
 
 # Create Work Directory
 directory = "tests"
-cwd = os.getcwd()
-parent_dir = cwd
+parent_dir = DATA_DIR
 path = os.path.join(parent_dir, directory)
 os.mkdir(path)
 for key, value in desired_writers.items():
     current_directory = path + '/' + str(key)
     os.mkdir(current_directory)
     for image in value:
-        shutil.copyfile("/home/mazen/IAM/training/" + image, current_directory + "/" + image)
+        shutil.copyfile(DATASET_DIR + "/" + image + ".png", current_directory + "/" + image + ".png")
 
 directory = "tests"
-cwd = os.getcwd()
-parent_dir = cwd
+parent_dir = DATA_DIR
 path = os.path.join(parent_dir, directory)
 # Create TestCases
 list_sub_folders_with_paths = [f.path for f in os.scandir(path) if f.is_dir()]
@@ -42,8 +41,8 @@ directory = "TestCases"
 path = os.path.join(parent_dir, directory)
 main_path = path
 os.mkdir(path)
-results = open(cwd + '/results.txt', "a")
-for i in range(1, 101):
+results = open(INPUTS_DIR + '/actual_results.txt', "a")
+for i in range(1, 501):
     path = main_path
     path = path + '/' + str(i)
     os.mkdir(path)
@@ -58,7 +57,7 @@ for i in range(1, 101):
     os.mkdir(path + '/' + str(second))
     os.mkdir(path + '/' + str(third))
 
-    cwd = os.getcwd() + '/tests/' + str(first)
+    cwd = DATA_DIR + '/tests/' + str(first)
     counter = 0
     for samples in paths.list_images(cwd):
         if counter == 2:
@@ -66,7 +65,7 @@ for i in range(1, 101):
         shutil.copyfile(samples, path + '/' + str(first) + '/' + str(samples[len(cwd):]))
         counter += 1
 
-    cwd = os.getcwd() + '/tests/' + str(second)
+    cwd = DATA_DIR + '/tests/' + str(second)
     counter = 0
     for samples in paths.list_images(cwd):
         if counter == 2:
@@ -74,7 +73,7 @@ for i in range(1, 101):
         shutil.copyfile(samples, path + '/' + str(second) + '/' + str(samples[len(cwd):]))
         counter += 1
 
-    cwd = os.getcwd() + '/tests/' + str(third)
+    cwd = DATA_DIR + '/tests/' + str(third)
     counter = 0
     for samples in paths.list_images(cwd):
         if counter == 2:
@@ -83,7 +82,7 @@ for i in range(1, 101):
         counter += 1
 
     test_image_id = secrets.choice([first, second, third])
-    cwd = os.getcwd() + '/tests/' + str(test_image_id)
+    cwd = DATA_DIR + '/tests/' + str(test_image_id)
     counter = 0
     for samples in paths.list_images(cwd):
         counter += 1
