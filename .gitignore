@@ -1,6 +1,6 @@
-*conda_env*
-*venv*
-*__pycache__*
-*.idea*
-*test*
-*dataset*
+*src/conda_env*
+*src/venv*
+*src/__pycache__*
+*src/.idea*
+*data*
+*src/.ipynb_checkpoints*

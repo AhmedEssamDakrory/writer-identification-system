@@ -27,8 +27,8 @@ def get_features(img, feature_extractor, line_voting):
 	return features
 
 def training_model():
-	model = KNeighborsClassifier(n_neighbors=3)
-	#model = SVC(C=0.5, gamma='auto', probability=True)
+# 	model = KNeighborsClassifier(n_neighbors=3)
+	model = SVC(C=0.2, gamma='auto', probability=True)
 	return model
 	
 	
@@ -53,15 +53,17 @@ def train_2(root_dir, feature_extractor, writers_dic, line_voting):
 	print("training.........")
 	labels = []
 	all_features = []
+	unique_writers = set()
 	for sample in os.listdir(root_dir):
 		writer =  writers_dic[sample[:-4]]
+		unique_writers.add(writer)
 		print("writer.......", writer)
 		gray_img = cv2.imread(os.path.join(root_dir, sample), 0)
 		features = get_features(gray_img, feature_extractor, line_voting)
 		for f in features:
 			all_features.append(f)
 			labels.append(str(writer))
-
+	print("trained on ", len(unique_writers), "unique writers")
 	model = training_model()
 	model.fit(all_features, labels)
 	return model
