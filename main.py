@@ -1,10 +1,13 @@
+import time
+import cv2
+import os
+import pandas as pd
+from train import *
+from predict import *
 from local_binary_pattern import FeatureExtractor
 from preprocessing import *
 from sklearn.svm import SVC
 from imutils import paths
-import time
-import cv2
-import os
 from matplotlib import pyplot as plt
 from natsort import natsorted
 from sklearn.neighbors import KNeighborsClassifier
@@ -13,100 +16,24 @@ from itertools import groupby
 train_line_voting = True
 predict_line_voting = True
 
-def get_features(root_dir, file, feature_extractor):
-    labels = []
-    features = []
-    for writer in os.listdir(os.path.join(root_dir, file)):
-        print(writer)
-        for sample in paths.list_images(os.path.join(root_dir, file, writer)):
-            print(sample)
-            gray = cv2.imread(sample, 0)
-            cropped_img = Preprocessor.paragraph_extraction(gray)
-            line_boundries = Preprocessor.line_segmentation(cropped_img)
-            hist = None
-            for line in line_boundries:
-                lbp = list(
-                    feature_extractor.local_binary_pattern(cropped_img[line[0]:line[2], line[1]:line[3]]).ravel())
-                if train_line_voting:
-                    hist = feature_extractor.histogram(lbp)
-                    labels.append(str(writer))
-                    features.append(hist)
-#                     plt.plot(hist)
-#                     plt.show()
-                else:
-                    hist = feature_extractor.histogram_acc(lbp, hist)
-            if not train_line_voting:
-                hist /= (hist.mean())
-                labels.append(str(writer))
-                features.append(hist)
-            
-#                 plt.plot(hist)
-#                 plt.show()
-            
-#             Preprocessor.draw_segmented_lines(cropped_img, line_boundries)
-#             Preprocessor.display_image(cropped_img)
-    return features, labels
-
-def check_if_tie_voting(lst):
-    lst.sort()
-    counts = [len(list(group)) for key, group in groupby(lst)]
-    mx_cnt = max(counts)
-    cnt = 0
-    for i in range(len(counts)):
-        if counts[i] == mx_cnt:
-            cnt += 1
-    return cnt > 1
-
-def get_prediction(root_dir, file, feature_extractor, model):
-    gray = cv2.imread(os.path.join(root_dir, file, 'test.png'), 0)
-    cropped_img = Preprocessor.paragraph_extraction(gray)
-    line_boundries = Preprocessor.line_segmentation(cropped_img)
-    i = 0
-    lst = []
-    hist = None
-    hist_acc = None
-    for line in line_boundries:
-        if line[2] > line[0] and line[3] > line[1]:
-            lbp = list(feature_extractor.local_binary_pattern(cropped_img[line[0]:line[2], line[1]:line[3]]).ravel())
-            if predict_line_voting:
-                hist = feature_extractor.histogram(lbp)
-                lst.append(model.predict(hist.reshape(1, -1)))
-                print("line " + str(i) + " presidctions is: ")
-                print(lst[i])
-            hist_acc = feature_extractor.histogram_acc(lbp, hist_acc)
-            i += 1
-    if not predict_line_voting:
-        hist_acc /= (hist_acc.mean())
-        return model.predict(hist_acc.reshape(1, -1))
-    else:
-        tie = check_if_tie_voting(lst)
-        if tie:
-            print("tie! predict on accumulated histogram")
-            return model.predict(hist_acc.reshape(1, -1))
-        else:
-            return max(lst, key=lst.count)
-
-
-def main():
+def main_1():
     root_dir = 'TestCases'
     time_file = open("time.txt", "w")
     results_file = open("results.txt", "w")
     actual_result=open("actual_results.txt", "r")
     actual_result_lines=actual_result.readlines()
-    feature_extractor = FeatureExtractor(24, 8)
+    feature_extractor = FeatureExtractor(8, 3)
     correct_classification = 0
     tests = natsorted(os.listdir(root_dir))
     num_of_tests = len(tests)
     for test in tests:
         print("Test: ", test)
         start_time = time.time()
-        features, labels = get_features(root_dir, test, feature_extractor)
-
-        model = KNeighborsClassifier(n_neighbors=3)
-#         model = SVC(C=0.5, gamma='auto', probability=True)
-        model.fit(features, labels)
-
-        prediction = get_prediction(root_dir, test, feature_extractor, model)[0]
+        model = train_1(root_dir, test, feature_extractor, train_line_voting)
+        
+        test_image_dir = os.path.join(root_dir, test, 'test.png')
+        test_img = cv2.imread(test_image_dir, 0)
+        prediction = get_prediction(test_img, feature_extractor, model, predict_line_voting)[0]
         time_taken = round(time.time() - start_time, 2)
         if int(prediction)==int(actual_result_lines[int(test)-1]):
             correct_classification += 1
@@ -121,7 +48,39 @@ def main():
 
     acc = ( correct_classification / num_of_tests ) * 100.0
     print("Accuracy is : "+str(acc)+' % ')
+    
+def main_2():
+    training_dir = 'training_data'
+    test_dir = 'testing_data'
+    
+    # get writers of images --------------------------------
+    writers_dic = {}
+    file = pd.read_csv('writer-id.csv', encoding="ISO-8859-1")
+    for i in range(0, len(list(file['image']))):
+        writers_dic[file['image'][i]] = file['label'][i]
+    
+    feature_extractor = FeatureExtractor(24, 8)
+    model = train_2(training_dir, feature_extractor, writers_dic, train_line_voting)
+    
+    #testing
+    tests = os.listdir(test_dir) 
+    correct_classification = 0
+    num_of_tests = len(tests)
+    for sample in tests:
+        print("Test image: ", sample)
+        test_image_dir = os.path.join(test_dir, sample)
+        test_img = cv2.imread(test_image_dir, 0)
+        prediction = get_prediction(test_img, feature_extractor, model, predict_line_voting)[0]
+        actual_writer = writers_dic[sample[:-4]]
+        print("Actual writer: ", actual_writer)
+        print("Predicted writer: ", prediction)
+        if int(prediction) == int(actual_writer):
+            correct_classification += 1
+        else:
+             print("Wrong classification!!")
+    acc = ( correct_classification / num_of_tests ) * 100.0
+    print("Accuracy is : "+str(acc)+' % ')
 
 
 if __name__ == '__main__':
-    main()
+    main_2()
