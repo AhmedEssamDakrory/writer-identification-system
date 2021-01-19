@@ -4,7 +4,7 @@ A system that is used to identify a writer from a handwritten script. In this sy
 1. Install project dependencies from requirements.txt
 2. Add the test cases in folder `/data/TestCases`
 3. Add the expected results in file `/inputs/actualt_results.txt`
-4. Open terminal in the `'/src'` directory then Run using this command
+4. Open terminal in the `/src` directory then Run using this command
 ```Console
 python main.py
 ```
