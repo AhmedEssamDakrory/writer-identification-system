@@ -28,7 +28,7 @@ def get_features(img, feature_extractor, line_voting):
 
 def training_model():
 # 	model = KNeighborsClassifier(n_neighbors=3)
-	model = SVC(C=0.2, gamma='auto', probability=True)
+	model = SVC(C=5.0, gamma='auto', probability=True)
 	return model
 	
 	
