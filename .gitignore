@@ -2,5 +2,6 @@
 *src/venv*
 *src/__pycache__*
 *src/.idea*
-*data*
+*.idea*
+*data/*
 *src/.ipynb_checkpoints*
