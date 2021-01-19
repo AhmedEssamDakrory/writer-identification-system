@@ -29,11 +29,9 @@ def get_features(img, feature_extractor, line_voting):
 
 
 def training_model():
-    # 	model = KNeighborsClassifier(n_neighbors=3)
-    model = SVC(C=1, gamma='auto', probability=True)
-    return model
-
-
+	model = SVC(C=5.0, gamma='auto', probability=True)
+	return model
+  
 def train_1(root_dir, file, feature_extractor, line_voting):
     labels = []
     all_features = []
