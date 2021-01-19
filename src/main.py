@@ -30,6 +30,7 @@ def main_1():
     correct_classification = 0
     tests = natsorted(os.listdir(root_dir))
     num_of_tests = len(tests)
+    i = 0
     for test in tests:
         print("Test: ", test)
         start_time = time.time()
@@ -39,7 +40,7 @@ def main_1():
         test_img = cv2.imread(test_image_dir, 0)
         prediction = get_prediction(test_img, feature_extractor, model, predict_line_voting)[0]
         time_taken = round(time.time() - start_time, 2)
-        if int(prediction) == int(actual_result_lines[int(test) - 1]):
+        if int(prediction) == int(actual_result_lines[i]):
             correct_classification += 1
         else:
             print("Wrong classified at TestCase ", test)
@@ -47,6 +48,7 @@ def main_1():
         print("Time taken: " + str(time_taken))
         results_file.write(prediction + '\n')
         time_file.write(str(time_taken) + '\n')
+        i += 1
     results_file.close()
     time_file.close()
 
