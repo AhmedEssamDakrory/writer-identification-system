@@ -3,12 +3,12 @@ import cv2
 import os
 import pandas as pd
 
-from src.train import *
-from src.predict import *
-from src.constants import *
-from src.preprocessing import *
+from train import *
+from predict import *
+from constants import *
+from preprocessing import *
 
-from src.local_binary_pattern import FeatureExtractor
+from local_binary_pattern import FeatureExtractor
 from sklearn.svm import SVC
 from imutils import paths
 from matplotlib import pyplot as plt

@@ -1,7 +1,7 @@
 import os
 import random
 import cv2
-from src.constants import *
+from constants import *
 
 root_dir = DATA_GROUPED_BY_WRITERS_DIR
 training_data_dir = TRAINING_DATA_DIR

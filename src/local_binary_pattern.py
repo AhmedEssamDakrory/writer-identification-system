@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from skimage.filters import threshold_otsu
 import cv2
-from src.preprocessing import *
+from preprocessing import *
 
 
 class FeatureExtractor:
