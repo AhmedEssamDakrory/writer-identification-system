@@ -3,12 +3,12 @@ import cv2
 import os
 import pandas as pd
 
-from train import *
-from predict import *
-from constants import *
-from preprocessing import *
+from src.train import *
+from src.predict import *
+from src.constants import *
+from src.preprocessing import *
 
-from local_binary_pattern import FeatureExtractor
+from src.local_binary_pattern import FeatureExtractor
 from sklearn.svm import SVC
 from imutils import paths
 from matplotlib import pyplot as plt
@@ -24,8 +24,8 @@ def main_1():
     root_dir = TEST_CASES_DIR
     time_file = open(OUTPUTS_DIR + "/time.txt", "w")
     results_file = open(OUTPUTS_DIR + "/results.txt", "w")
-    actual_result=open(INPUTS_DIR + "/actual_results.txt", "r")
-    actual_result_lines=actual_result.readlines()
+    actual_result = open(INPUTS_DIR + "/actual_results.txt", "r")
+    actual_result_lines = actual_result.readlines()
     feature_extractor = FeatureExtractor(8, 6)
     correct_classification = 0
     tests = natsorted(os.listdir(root_dir))
@@ -39,10 +39,10 @@ def main_1():
         test_img = cv2.imread(test_image_dir, 0)
         prediction = get_prediction(test_img, feature_extractor, model, predict_line_voting)[0]
         time_taken = round(time.time() - start_time, 2)
-        if int(prediction)==int(actual_result_lines[int(test)-1]):
+        if int(prediction) == int(actual_result_lines[int(test) - 1]):
             correct_classification += 1
         else:
-            print("Wrong classified at TestCase ",test)
+            print("Wrong classified at TestCase ", test)
         print("Prediction: " + prediction)
         print("Time taken: " + str(time_taken))
         results_file.write(prediction + '\n')
@@ -51,7 +51,7 @@ def main_1():
     time_file.close()
 
     acc = (correct_classification / num_of_tests) * 100.0
-    print("Accuracy is : "+str(acc)+' % ')
+    print("Accuracy is : " + str(acc) + ' % ')
 
 
 def main_2():
@@ -84,7 +84,7 @@ def main_2():
         else:
             print("Wrong classification!!")
     acc = (correct_classification / num_of_tests) * 100.0
-    print("Accuracy is : "+str(acc)+' % ')
+    print("Accuracy is : " + str(acc) + ' % ')
 
 
 if __name__ == '__main__':
