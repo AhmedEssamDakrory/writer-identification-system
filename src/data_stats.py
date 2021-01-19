@@ -1,6 +1,6 @@
 import os
 
-from src.constants import TEST_CASES_DIR
+from constants import TEST_CASES_DIR
 
 path = TEST_CASES_DIR
 file_list = []
