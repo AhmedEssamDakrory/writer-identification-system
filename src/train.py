@@ -1,5 +1,5 @@
-from src.local_binary_pattern import FeatureExtractor
-from src.preprocessing import *
+from local_binary_pattern import FeatureExtractor
+from preprocessing import *
 from sklearn.svm import SVC
 import cv2
 import os

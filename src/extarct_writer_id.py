@@ -1,7 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 
-from src.constants import INPUTS_DIR
+from constants import INPUTS_DIR
 
 arr = os.listdir('xml')
 f = open(INPUTS_DIR + '/writer-id.txt', "w")
